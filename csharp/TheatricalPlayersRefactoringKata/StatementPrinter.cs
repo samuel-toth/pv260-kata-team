@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -10,7 +10,20 @@ namespace TheatricalPlayersRefactoringKata
 
         public string PrintAsHtml(Invoice invoice, Dictionary<string, Play> plays)
         {
-            return "";
+            var totalAmount = 0;
+            var volumeCredits = 0;
+            var result = "<html>\n";
+            result += string.Format("<h1>Statement for {0}</h1>\n", invoice.Customer);
+            CultureInfo cultureInfo = new CultureInfo("en-US");
+
+            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits, ref result, cultureInfo);
+            foreach (var perf in invoice.Performances)
+            {
+                result += string.Format(cultureInfo, "  {0}: {1:C} ({2} seats)\n", plays[perf.PlayID].Name, Convert.ToDecimal(perf.Amount / 100), perf.Audience);
+            }
+            result += string.Format(cultureInfo, "Amount owed is {0:C}\n", Convert.ToDecimal(totalAmount / 100));
+            result += string.Format("You earned {0} credits\n", volumeCredits);
+            return result;
         }
 
 
@@ -24,7 +37,7 @@ namespace TheatricalPlayersRefactoringKata
             CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits, ref result, cultureInfo);
             foreach (var perf in invoice.Performances)
             {
-
+                result += string.Format(cultureInfo, "  {0}: {1:C} ({2} seats)\n", plays[perf.PlayID].Name, Convert.ToDecimal(perf.Amount / 100), perf.Audience);
             }
             result += string.Format(cultureInfo, "Amount owed is {0:C}\n", Convert.ToDecimal(totalAmount / 100));
             result += string.Format("You earned {0} credits\n", volumeCredits);
@@ -36,23 +49,22 @@ namespace TheatricalPlayersRefactoringKata
             foreach (var perf in invoice.Performances)
             {
                 var play = plays[perf.PlayID];
-                var thisAmount = 0;
                 switch (play.Type)
                 {
                     case "tragedy":
-                        thisAmount = 40000;
+                        perf.Amount = 40000;
                         if (perf.Audience > 30)
                         {
-                            thisAmount += 1000 * (perf.Audience - 30);
+                            perf.Amount += 1000 * (perf.Audience - 30);
                         }
                         break;
                     case "comedy":
-                        thisAmount = 30000;
+                        perf.Amount = 30000;
                         if (perf.Audience > 20)
                         {
-                            thisAmount += 10000 + 500 * (perf.Audience - 20);
+                            perf.Amount += 10000 + 500 * (perf.Audience - 20);
                         }
-                        thisAmount += 300 * perf.Audience;
+                        perf.Amount += 300 * perf.Audience;
                         break;
                     default:
                         throw new Exception("unknown type: " + play.Type);
@@ -63,8 +75,7 @@ namespace TheatricalPlayersRefactoringKata
                 if ("comedy" == play.Type) volumeCredits += (int)Math.Floor((decimal)perf.Audience / 5);
 
                 // print line for this order
-                result += string.Format(cultureInfo, "  {0}: {1:C} ({2} seats)\n", play.Name, Convert.ToDecimal(thisAmount / 100), perf.Audience);
-                totalAmount += thisAmount;
+                totalAmount += perf.Amount;
             }
         }
 
