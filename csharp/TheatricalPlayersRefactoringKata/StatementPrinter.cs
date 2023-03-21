@@ -12,19 +12,19 @@ namespace TheatricalPlayersRefactoringKata
             var volumeCredits = 0;
             var result = "<html>\n";
             result += string.Format("  <h1>Statement for {0}</h1>\n", invoice.Customer);
-            result += "  <table>";
-            result += "    <tr><th>play</th><th>seats</th><th>cost</th></tr>";
+            result += "  <table>\n";
+            result += "    <tr><th>play</th><th>seats</th><th>cost</th></tr>\n";
             CultureInfo cultureInfo = new CultureInfo("en-US");
 
             CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits, ref result, cultureInfo);
             foreach (var perf in invoice.Performances)
             {
-                result += string.Format(cultureInfo, "<tr><td>{0}: {1:C} ({2} seats)\n", plays[perf.PlayID].Name,
+                result += string.Format(cultureInfo, "    <tr><td>{0}</td><td>{2}</td><td>{1:C}</td></tr>\n", plays[perf.PlayID].Name,
                     Convert.ToDecimal(perf.Amount / 100), perf.Audience);
             }
-
-            result += string.Format(cultureInfo, "<p>Amount owed is {0:C}</p>\n", Convert.ToDecimal(totalAmount / 100));
-            result += string.Format("<p>You earned {0} credits\n</p>", volumeCredits);
+            result += "  </table>\n";
+            result += string.Format(cultureInfo, "  <p>Amount owed is <em>{0:C}</em></p>\n", Convert.ToDecimal(totalAmount / 100));
+            result += string.Format("  <p>You earned <em>{0}</em> credits</p>\n", volumeCredits);
             result += "</html>";
             
             return result;
