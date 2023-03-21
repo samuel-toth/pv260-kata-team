@@ -1,3 +1,5 @@
+using System;
+
 namespace TheatricalPlayersRefactoringKata
 {
     public class Performance
@@ -5,6 +7,7 @@ namespace TheatricalPlayersRefactoringKata
         private string _playID;
         private int _audience;
         private int _amount;
+
 
         public int Amount
         {

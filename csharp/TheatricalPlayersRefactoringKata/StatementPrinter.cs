@@ -9,14 +9,14 @@ namespace TheatricalPlayersRefactoringKata
         public string PrintAsHtml(Invoice invoice, Dictionary<string, Play> plays)
         {
             var totalAmount = 0;
-            var volumeCredits = 0;
+            var volumeCredits = CalculateVolumeCredits(invoice, plays);
             var result = "<html>\n";
             result += string.Format("  <h1>Statement for {0}</h1>\n", invoice.Customer);
             result += "  <table>\n";
             result += "    <tr><th>play</th><th>seats</th><th>cost</th></tr>\n";
             CultureInfo cultureInfo = new CultureInfo("en-US");
 
-            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits);
+            CalculatePerformanceCost(invoice, plays, ref totalAmount);
             foreach (var perf in invoice.Performances)
             {
                 result += string.Format(cultureInfo, "    <tr><td>{0}</td><td>{2}</td><td>{1:C}</td></tr>\n", plays[perf.PlayID].Name,
@@ -34,11 +34,12 @@ namespace TheatricalPlayersRefactoringKata
         public string Print(Invoice invoice, Dictionary<string, Play> plays)
         {
             var totalAmount = 0;
-            var volumeCredits = 0;
+            var volumeCredits = CalculateVolumeCredits(invoice, plays);
+            
             var result = string.Format("Statement for {0}\n", invoice.Customer);
             CultureInfo cultureInfo = new CultureInfo("en-US");
 
-            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits);
+            CalculatePerformanceCost(invoice, plays, ref totalAmount);
             foreach (var perf in invoice.Performances)
             {
                 result += string.Format(cultureInfo, "  {0}: {1:C} ({2} seats)\n", plays[perf.PlayID].Name,
@@ -50,8 +51,10 @@ namespace TheatricalPlayersRefactoringKata
             return result;
         }
 
-        private static void CalculatePerformanceCost(Invoice invoice, Dictionary<string, Play> plays,
-            ref int totalAmount, ref int volumeCredits)
+
+
+        private void CalculatePerformanceCost(Invoice invoice, Dictionary<string, Play> plays,
+            ref int totalAmount)
         {
             foreach (var perf in invoice.Performances)
             {
@@ -79,14 +82,24 @@ namespace TheatricalPlayersRefactoringKata
                         throw new Exception("unknown type: " + play.Type);
                 }
 
-                // add volume credits
-                volumeCredits += Math.Max(perf.Audience - 30, 0);
-                // add extra credit for every ten comedy attendees
-                if ("comedy" == play.Type) volumeCredits += (int)Math.Floor((decimal)perf.Audience / 5);
-
                 // print line for this order
                 totalAmount += perf.Amount;
             }
+        }
+
+        private static int CalculateVolumeCredits(Invoice invoice, Dictionary<string, Play> plays)
+        {
+            var volumeCredits = 0;
+            foreach (var perf in invoice.Performances)
+            {
+                var play = plays[perf.PlayID];
+
+                volumeCredits += Math.Max(perf.Audience - 30, 0);
+                // add extra credit for every ten comedy attendees
+                if ("comedy" == play.Type) volumeCredits += (int)Math.Floor((decimal)perf.Audience / 5);
+            }
+
+            return volumeCredits;
         }
     }
 }
