@@ -16,7 +16,7 @@ namespace TheatricalPlayersRefactoringKata
             result += "    <tr><th>play</th><th>seats</th><th>cost</th></tr>\n";
             CultureInfo cultureInfo = new CultureInfo("en-US");
 
-            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits, ref result, cultureInfo);
+            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits);
             foreach (var perf in invoice.Performances)
             {
                 result += string.Format(cultureInfo, "    <tr><td>{0}</td><td>{2}</td><td>{1:C}</td></tr>\n", plays[perf.PlayID].Name,
@@ -38,7 +38,7 @@ namespace TheatricalPlayersRefactoringKata
             var result = string.Format("Statement for {0}\n", invoice.Customer);
             CultureInfo cultureInfo = new CultureInfo("en-US");
 
-            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits, ref result, cultureInfo);
+            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits);
             foreach (var perf in invoice.Performances)
             {
                 result += string.Format(cultureInfo, "  {0}: {1:C} ({2} seats)\n", plays[perf.PlayID].Name,
@@ -51,7 +51,7 @@ namespace TheatricalPlayersRefactoringKata
         }
 
         private static void CalculatePerformanceCost(Invoice invoice, Dictionary<string, Play> plays,
-            ref int totalAmount, ref int volumeCredits, ref string result, CultureInfo cultureInfo)
+            ref int totalAmount, ref int volumeCredits)
         {
             foreach (var perf in invoice.Performances)
             {
