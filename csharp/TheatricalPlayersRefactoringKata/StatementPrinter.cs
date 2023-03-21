@@ -6,6 +6,14 @@ namespace TheatricalPlayersRefactoringKata
 {
     public class StatementPrinter
     {
+
+
+        public string PrintAsHtml(Invoice invoice, Dictionary<string, Play> plays)
+        {
+            return "";
+        }
+
+
         public string Print(Invoice invoice, Dictionary<string, Play> plays)
         {
             var totalAmount = 0;
@@ -13,21 +21,35 @@ namespace TheatricalPlayersRefactoringKata
             var result = string.Format("Statement for {0}\n", invoice.Customer);
             CultureInfo cultureInfo = new CultureInfo("en-US");
 
-            foreach(var perf in invoice.Performances) 
+            CalculatePerformanceCost(invoice, plays, ref totalAmount, ref volumeCredits, ref result, cultureInfo);
+            foreach (var perf in invoice.Performances)
+            {
+
+            }
+            result += string.Format(cultureInfo, "Amount owed is {0:C}\n", Convert.ToDecimal(totalAmount / 100));
+            result += string.Format("You earned {0} credits\n", volumeCredits);
+            return result;
+        }
+
+        private static void CalculatePerformanceCost(Invoice invoice, Dictionary<string, Play> plays, ref int totalAmount, ref int volumeCredits, ref string result, CultureInfo cultureInfo)
+        {
+            foreach (var perf in invoice.Performances)
             {
                 var play = plays[perf.PlayID];
                 var thisAmount = 0;
-                switch (play.Type) 
+                switch (play.Type)
                 {
                     case "tragedy":
                         thisAmount = 40000;
-                        if (perf.Audience > 30) {
+                        if (perf.Audience > 30)
+                        {
                             thisAmount += 1000 * (perf.Audience - 30);
                         }
                         break;
                     case "comedy":
                         thisAmount = 30000;
-                        if (perf.Audience > 20) {
+                        if (perf.Audience > 20)
+                        {
                             thisAmount += 10000 + 500 * (perf.Audience - 20);
                         }
                         thisAmount += 300 * perf.Audience;
@@ -44,9 +66,7 @@ namespace TheatricalPlayersRefactoringKata
                 result += string.Format(cultureInfo, "  {0}: {1:C} ({2} seats)\n", play.Name, Convert.ToDecimal(thisAmount / 100), perf.Audience);
                 totalAmount += thisAmount;
             }
-            result += string.Format(cultureInfo, "Amount owed is {0:C}\n", Convert.ToDecimal(totalAmount / 100));
-            result += string.Format("You earned {0} credits\n", volumeCredits);
-            return result;
         }
+
     }
 }
